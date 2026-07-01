@@ -1,3 +1,7 @@
-# 本目录用 git 仅作本地版本/备份(私密仓库,提交时机由你决定)
+# devin/skills 镜像分支：技能发现产物，本地中心库(720_Agents)为正本。
+# 铁律：secrets.env 永不进本镜像仓。
+secrets.env
 
-# 私密仓库:密钥明文入库 —— secrets.env 故意纳入版本控制,不忽略。
+# python 缓存
+__pycache__/
+*.pyc

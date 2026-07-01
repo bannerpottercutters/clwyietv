@@ -1,0 +1,34 @@
+[
+  {
+    "name": "会话开局：读 AGENTS.md + 取用技能",
+    "body": "开局先做两件事：\n（1）有隧道→base64 读 `D:\\700_Resources\\720_Agents\\AGENTS.md` 了解全局布局：\n`powershell -NoProfile -Command \"[Convert]::ToBase64String([IO.File]::ReadAllBytes('D:\\700_Resources\\720_Agents\\AGENTS.md'))\"`\n（2）无论有无隧道→clone+copy 取用技能（只 clone 不 copy 无效，技能必须落进 `~/.devin/skills/` 才被扫描）：\n```\nrm -rf ~/skills-mirror && git clone -b devin/skills <宿主仓URL> ~/skills-mirror && mkdir -p ~/.devin/skills && cp -r ~/skills-mirror/.devin/skills/* ~/.devin/skills/ && ls ~/.devin/skills/\n```\n不知宿主仓→列已连接仓、挑带 `devin/skills` 分支的。clone 失败（分支不存在）→该账号尚未同步技能，跳过取用、正常干活即可，不需要提示用户。详见 `playbooks/skills-sync.md`。",
+    "trigger_description": "新 Devin 云端会话开始时。",
+    "pinned_repo": "all",
+    "macro": "session-start",
+    "is_enabled": true
+  },
+  {
+    "name": "隧道操作：只改本地、不推 GitHub",
+    "body": "隧道操作用户本地文件时只改本地、不推 GitHub（用户自己决定何时提交）。收发只走 `/api/exec`（POST JSON，`Authorization: Bearer <token>`，内层 `powershell -NoProfile -Command`）；读写用 base64 编解码，写文件分块 ≤~5000 字符 + SHA256 校验；别信终端中文回显（PTY 乱码），以 hash / 字节为准。完整策略与排错见 `playbooks/devin-tunnel-ops.md`。",
+    "trigger_description": "内网穿透隧道运行、用户提出代码修改或文件操作需求时。",
+    "pinned_repo": "all",
+    "macro": "tunnel-ops",
+    "is_enabled": true
+  },
+  {
+    "name": "技能同步",
+    "body": "手动触发。本地 = 正本 → push Devin 云端 `devin/skills` 分支，绝不反向覆盖；产物可 `--force-with-lease`。push 完成后当前会话也执行一次 clone+copy 让技能立即生效（不用换会话）。详见 `playbooks/skills-sync.md`。",
+    "trigger_description": "用户要求\"同步 / 更新 / 部署技能\"时。",
+    "pinned_repo": "all",
+    "macro": "rule-1782658096240",
+    "is_enabled": true
+  },
+  {
+    "name": "产出物落盘且对话框回传",
+    "body": "为用户产出的附属物两处都给：（1）落盘 `output/`（md / 文档→`output/`、图→`output/fig/`、其它按类型分子目录）；（2）对话框附件回传。改项目代码照原目录放、不挪进 `output/`；用户指定路径以用户为准。",
+    "trigger_description": "为用户产出对话附属物（md / 图片 / html / 数据等）时。",
+    "pinned_repo": "all",
+    "macro": "rule-1782658097050",
+    "is_enabled": true
+  }
+]
